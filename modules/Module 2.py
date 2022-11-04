@@ -1,53 +1,64 @@
-from datetime import datetime #importeert de tijd
-
-import psycopg2  #importeert de postgres integratie tool
+from datetime import datetime
+import psycopg2
 
 tijd = str(datetime.now())
-tijd = tijd[0:19] #verwijderd de miliseconden van de tijd
+tijd = tijd[0:19]
 
-
-#Inloggegevens:
 modmail = "JORN.BOS@STUDENT.HU.NL"
 modnaam = "JORN BOS"
 
-#Opent resultaat.csv met schrijf rechten
+
+#verbinden met DB
+con = psycopg2.connect( 
+           host = "localhost",
+           database = "ZUIL",
+           user = "postgres",
+           password = "Jorn2003",
+           port = 5432          )
+
+
+#cursor
+cur = con.cursor()
+
+berichten = []
+bericht = []
+lijst_moderator = []
+#opent het bestand met alle resultaten
 r = open("resultaat.csv", "r")
-bericht = r.readline()
+berichten = r.readlines()
 r.close
 
-#inloggegevenves database
-connection_string = "host='localhost' dbname='ZUIL' user='postgres' password='Jorn2003'"
+modnaam = input("Wat is uw naam?: ")
+if modnaam.lower() != "jorn bos":
+      print(exit("Dit is geen geldige naam."))
+modmail = input("Wat is uw mail?: ")
+if  modmail.lower() != "jorn.bos@student.hu.nl":
+    print(exit("Dit is geen geldige mailadres"))   
 
-
-
-vraagmail = input(str("Wat is uw mail adres?: "))
-if vraagmail.upper() != modmail:
-    print("Dit is geen geldig moderator mail adres.")
-
-else:
-    vraagnaam = input(str("Wat is uw naam?: "))
-    if vraagnaam.upper() != modnaam:
-        print("Dit is geen geldige moderator naam.")
+for x in berichten:
+    bericht = x.strip("\n").split(";")
+    print(f"\nNaam: {bericht[0]} \nBericht: {bericht[1]}\n")
     
-    else: 
-        print("\n" + str(bericht) + "\n")
-        keuring = input(str("Keurt u dit bericht goed? (ja/nee): "))
-        while True:
-            if keuring.upper() == "NEE":
-                bericht = next(r)
-                print("\n" + bericht + "\n")
-                keuring = input(str("Keurt u dit bericht goed? (ja/nee): "))
+    goedkeuring = input("Keurt u dit bericht goed?(ja/nee): ")
+    
+    if goedkeuring.upper() == "JA":
+        goedgekeurd = 1
 
-            elif keuring.upper() == "JA":
-                r = open("goedgekeurd.csv", "a")
-                r.write(f"{bericht};{modnaam};{modmail}{tijd}")
-                r.close
-                break
-               
+    if goedkeuring.upper() == "NEE":
+        goedgekeurd = 0
+    
+    tijd = str(datetime.now())
+    tijd = tijd[0:19]
+    lijst_moderator = modnaam,modmail,tijd
+    bericht.extend(lijst_moderator)
+    sqlcode = "INSERT INTO bericht (naam, bericht, datum_tijd, stationnaam, goedgekeurd_door, Mailadres, goedgekeurd_tijd) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+    if goedgekeurd == 1:
+        cur.execute(sqlcode, bericht)
+    
+con.commit()
 
-        
-
-
-            
+leeg = open("resultaat.csv", "w")
+leeg.truncate(0)
+leeg.close()
 
 
