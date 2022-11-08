@@ -7,6 +7,7 @@ lijn = "------------------------------------"
 tijd = str(datetime.now())
 n = "\n"
 komma = ";"
+
 #deze input vraagt of de gebruiker hem anoniem wilt invullen en gaat daarna naar de if statements
 anoniem = input(str(lijn + n  + "Wilt u deze vragen anoniem beantworden of niet? (ja/nee): "))
 #de volgende 3 lijnen laten lezen het stations.txt bestand en kiest een random station uit en zet het daarna in de variable locatie
@@ -23,7 +24,7 @@ if anoniem.upper() == "JA":
     bericht = input(str(lijn + n + "Wat is het bericht wat u achter wilt laten?: "))
     #mocht het bericht langer zijn dan 140 karakters dan krijgt de gebruiker een error 
     if len(bericht) > 140:
-        print("Dit bericht heeft meer dan 140 karakters")
+        print(exit("Dit bericht heeft meer dan 140 karakters"))
     
 
 #hier word het antwoord van anoniem automatisch hoofdletter gemaakt
@@ -34,7 +35,8 @@ elif anoniem.upper() == 'NEE':
     bericht = input(str(lijn + n + "Wat is het bericht wat u achter wilt laten?: "))
     #mocht het bericht langer zijn dan 140 karakters dan krijgt de gebruiker een error 
     if len(bericht) > 140:
-        print("Dit bericht heeft meer dan 140 karakters")
+        print(exit("Dit bericht heeft meer dan 140 karakters"))
+
 #als het antwoord niet ja of nee is dan krijgt de gebruiker een error
 else:
     print("Dat is geen geldig antwoord, kies uit ja of nee.")
@@ -45,6 +47,6 @@ else:
 tijda = tijd[0:19]
 nnaam = str(naam)
 antwoord = f"{nnaam};{bericht};{tijda};{locatie}"
-r = open('resultaat.csv', "a")
+r = open('bericht.csv', "a")
 r.write(antwoord)
 r.close
